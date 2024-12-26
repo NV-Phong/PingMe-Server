@@ -18,7 +18,7 @@ async function bootstrap() {
    });
    await app.listen(process.env.PORT);
    Logger.log(
-      `🚀 PingMe-Server is running on port http://localhost:${process.env.PORT} 🚀`,
+      `🚀 PingMe-Server is running on port ${process.env.HOST}:${process.env.PORT} 🚀`,
    );
 
    if (module.hot) {
