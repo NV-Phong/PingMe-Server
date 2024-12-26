@@ -99,4 +99,30 @@ export class AuthService {
          HttpStatus.BAD_REQUEST,
       );
    }
+
+   async RefreshAccessToken(
+      refreshaccesstokenDTO: RefreshAccessTokenDTO,
+   ): Promise<TokenResponse> {
+      try {
+         const user = await this.usermodel
+            .findById(refreshaccesstokenDTO.IDUser)
+            .exec();
+         if (!user) {
+            throw new HttpException(
+               `User with ID ${refreshaccesstokenDTO.IDUser} not found`,
+               HttpStatus.NOT_FOUND,
+            );
+         }
+         return { access_token: this.GenerateAccessToken(user) };
+      } catch (error) {
+         throw new HttpException(
+            {
+               message: 'Invalid token',
+               statusCode: HttpStatus.BAD_REQUEST,
+               error: error.message || error,
+            },
+            HttpStatus.BAD_REQUEST,
+         );
+      }
+   }
 }
