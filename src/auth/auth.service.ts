@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema/use.schema';
-import { RegisterDTO } from './dto/create.dto';
+import { LoginDTO, RegisterDTO } from './dto/post.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class AuthService {
       private readonly jwtservice: JwtService,
    ) {}
 
-   async RegisterNewUser(registerDTO: RegisterDTO): Promise<any> {
+   async Register(registerDTO: RegisterDTO): Promise<any> {
       const user = await this.usermodel.findOne({
          $or: [
             { username: registerDTO.username },
@@ -54,5 +54,49 @@ export class AuthService {
             user: { username: registerDTO.username, email: registerDTO.email },
          };
       }
+   }
+
+   GenerateAccessToken(user: User) {
+      const payload = {
+         username: user.username,
+         sub: user._id,
+         email: user.email,
+      };
+      return this.jwtservice.sign(payload, {
+         secret: process.env.ACCESS_TOKEN_SECRET,
+         expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
+      });
+   }
+
+   GenerateRefreshToken(user: User) {
+      const payload = {
+         username: user.username,
+         sub: user._id,
+         email: user.email,
+      };
+      return this.jwtservice.sign(payload, {
+         secret: process.env.REFRESH_TOKEN_SECRET,
+         expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
+      });
+   }
+
+   async Login(login: LoginDTO): Promise<LoginResponse> {
+      const user = await this.usermodel.findOne({ username: login.username });
+      if (user && (await bcrypt.compare(login.password, user.password))) {
+         const AccessToken = this.GenerateAccessToken(user);
+         const RefreshToken = this.GenerateRefreshToken(user);
+
+         return {
+            access_token: AccessToken,
+            refresh_token: RefreshToken,
+         };
+      }
+      throw new HttpException(
+         {
+            message: 'Invalid credentials, please try again',
+            statusCode: HttpStatus.BAD_REQUEST,
+         },
+         HttpStatus.BAD_REQUEST,
+      );
    }
 }
