@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Request, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/schema/use.schema';
@@ -22,8 +22,9 @@ export class UserController {
    }
 
    // GET: /users/infuser/:id
-  @Get('infuser/:id')
-  async getUser(@Param('id') id: string): Promise<User> {
-    return this.userService.getUserById(id);
+  @Get('infuser/getById')
+  async getUser(@Request() req): Promise<User> {
+   const id = req.user.IDUser;
+   return this.userService.getUserById(id);
   }
 }

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
+import { ChatType } from 'src/types/chat-type.enum';
 
 @WebSocketGateway(3002, {
    cors: {
@@ -48,11 +49,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
    @SubscribeMessage('send-message')
    async handleSendMessage(
       client: Socket,
-      payload: { room: string; senderId: string; content: string },
+      payload: {
+         room: string;
+         senderId: string;
+         content: string;
+         chatType: string;
+      },
    ): Promise<void> {
-      const { room, senderId, content } = payload;
+      const { room, senderId, content, chatType } = payload;
 
-      if (!senderId || !room || !content) {
+      if (!senderId || !room || !content || !chatType) {
          console.log('error, thiếu trường dữ liệu');
          client.emit(
             'error',
@@ -60,25 +66,54 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
          );
          return;
       }
+      if (chatType === ChatType.GROUP) {
+         // **Xử lý tin nhắn nhóm**
 
-      // Kiểm tra nếu client không ở trong room
-      if (!this.server.sockets.adapter.rooms.get(room)?.has(client.id)) {
-         client.emit('error', 'You are not in this room');
-         return;
+         // Nếu client chưa tham gia room, tự động join vào room
+         if (!this.server.sockets.adapter.rooms.get(room)?.has(client.id)) {
+            client.join(room);
+            console.log(`${client.id} đã tham gia phòng: ${room}`);
+         }
+
+         // Lưu tin nhắn vào MongoDB
+         const message = await this.chatService.saveMessage(
+            senderId,
+            room,
+            content,
+         );
+
+         // Gửi tin nhắn đến tất cả người dùng trong phòng
+         this.server.to(room).emit('receive-message', message);
+
+         // Xác nhận gửi thành công cho người gửi
+         client.emit('message-sent', message);
+      } else if (chatType === ChatType.PERSONAL) {
+         // **Xử lý tin nhắn cá nhân**
+
+         // Gửi tin nhắn trực tiếp đến người nhận (room = ID của người nhận)
+         const recipientSocket = this.server.sockets.sockets.get(room);
+
+         if (!recipientSocket) {
+            client.emit('error', 'Recipient is not connected');
+            return;
+         }
+
+         // Lưu tin nhắn vào MongoDB
+         const message = await this.chatService.saveMessage(
+            senderId,
+            room,
+            content,
+         );
+
+         // Gửi tin nhắn trực tiếp đến người nhận
+         recipientSocket.emit('receive-message', message);
+
+         // Xác nhận gửi thành công cho người gửi
+         client.emit('message-sent', message);
+      } else {
+         // Loại `chatType` không hợp lệ
+         client.emit('error', 'Invalid chatType');
       }
-
-      // Lưu tin nhắn vào MongoDB
-      const message = await this.chatService.saveMessage(
-         senderId,
-         room,
-         content,
-      );
-
-      // Gửi tin nhắn đến tất cả người dùng trong phòng
-      this.server.to(room).emit('receive-message', message);
-
-      // Xác nhận gửi thành công cho người gửi
-      client.emit('message-sent', message);
    }
 
    // Lấy lịch sử tin nhắn trong phòng
