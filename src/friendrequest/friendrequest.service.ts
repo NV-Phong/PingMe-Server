@@ -90,4 +90,23 @@ export class FriendRequestService {
       request,
     };
   }
+  async declineRequest(IDSender: string, IDReceiver: string, IDFriendRequest: string) {
+    const request = await this.friendRequestModel.findOneAndUpdate(
+      { _id: IDFriendRequest, Status: FriendRequestStatus.PENDING },
+      { Status: FriendRequestStatus.DECLINED },
+      { new: true },
+    );
+
+    if (!request) {
+      throw new HttpException(
+        { message: 'Friend request not found or already handled.' },
+        HttpStatus.BAD_REQUEST,  // Trả về mã lỗi 400 nếu không tìm thấy yêu cầu
+      );
+    }
+
+    return {
+      message: 'Friend request declined successfully.',
+      request,
+    };
+  }
 }

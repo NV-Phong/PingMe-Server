@@ -11,7 +11,7 @@ export class FriendRequestController {
     return this.friendRequestService.sendRequest(body.IDSender, body.IDReceiver);
   }
 
-  
+
   @Post('accept/:friendRequestId')
   async acceptRequest(
     @Param('friendRequestId') friendRequestId: string,
@@ -21,6 +21,17 @@ export class FriendRequestController {
       body.IDSender,
       body.IDReceiver,
       friendRequestId,
+    );
+  }
+  @Post('decline/:friendRequestId')
+  async declineRequest(
+    @Param('friendRequestId') friendRequestId: string, 
+    @Body() body: { IDSender: string; IDReceiver: string },
+  ) {
+    return this.friendRequestService.declineRequest(
+      body.IDSender, 
+      body.IDReceiver,
+      friendRequestId,  // ID của friend request để từ chối
     );
   }
 
