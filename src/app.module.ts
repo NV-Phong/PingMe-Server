@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
+import { FriendrequestModule } from './friendrequest/friendrequest.module';
 
 @Module({
    imports: [
@@ -15,6 +16,7 @@ import { UserModule } from './user/user.module';
       MongooseModule.forRoot(process.env.DATABASE),
       AuthModule,
       UserModule,
+      FriendrequestModule,
    ],
    controllers: [AppController],
    providers: [AppService],
