@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { FriendrequestModule } from './friendrequest/friendrequest.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
    imports: [
@@ -17,6 +18,7 @@ import { FriendrequestModule } from './friendrequest/friendrequest.module';
       AuthModule,
       UserModule,
       FriendrequestModule,
+      ChatModule,
    ],
    controllers: [AppController],
    providers: [AppService],
