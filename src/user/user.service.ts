@@ -1,3 +1,4 @@
+
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -75,6 +76,42 @@ export class UserService {
   
       return { message: 'Unfriended successfully.' };
     }
-    
-    
+
+   async updateUser(
+      id: string,
+      updateData: Partial<Omit<User, '_id' | 'password'>>,
+   ): Promise<User> {
+      // Kiểm tra nếu id không hợp lệ
+      if (!Types.ObjectId.isValid(id)) {
+         throw new NotFoundException(`User with ID "${id}" not found`);
+      }
+
+      // Cập nhật thông tin người dùng
+      const updatedUser = await this.userModel
+         .findByIdAndUpdate(
+            id,
+            { $set: updateData }, // Chỉ cập nhật các thuộc tính được truyền
+            { new: true, runValidators: true }, // Trả về document sau khi cập nhật
+         )
+         .exec();
+
+      if (!updatedUser) {
+         throw new NotFoundException(`User with ID "${id}" not found`);
+      }
+
+      return updatedUser;
+   }
+
+   // Lấy thông tin user theo ID
+   async getUserById(id: string): Promise<User> {
+      try {
+         const user = await this.userModel.findById(id).exec();
+         if (!user) {
+            throw new NotFoundException(`User with ID "${id}" not found`);
+         }
+         return user;
+      } catch (error) {
+         throw new NotFoundException(`User with ID "${id}" not found`);
+      }
+   }
 }

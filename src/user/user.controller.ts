@@ -1,8 +1,14 @@
+
 import { Body, Controller, Get,Request, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/configuration/jwt-auth.guard';
+
+
+
+
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-//import { Request as ExpressRequest } from 'express';
+import { User } from 'src/schema/use.schema';
+
+
 @Controller('user')
 
 @UseGuards(AuthGuard('jwt'))
@@ -17,6 +23,7 @@ export class UserController {
    GetUserByKeyword(@Param('keyword') keyword: string) {
       return this.userService.SearchUsersByKeyword(keyword);
    }
+
 
    @Get('list/friend')
    async getFriends(@Request() req) {
@@ -36,4 +43,20 @@ export class UserController {
  
      return this.userService.unfriend(IDUser, IDFriend);  // Gọi service để hủy kết bạn
    }
+
+   @Patch(':id')
+   async updateUser(
+      @Param('id') id: string,
+      @Body() updateData: Partial<Omit<User, '_id' | 'password'>>,
+   ) {
+      return this.userService.updateUser(id, updateData);
+   }
+
+   // GET: /users/infuser/:id
+  @Get('infuser/getById')
+  async getUser(@Request() req): Promise<User> {
+   const id = req.user.IDUser;
+   return this.userService.getUserById(id);
+  }
+
 }
