@@ -38,4 +38,20 @@ export class UserService {
          displayName: user.displayName,
       }));
    }
+   // Lấy danh sách bạn bè 
+   async getAcceptedFriends(userId: string): Promise<User[]> {
+      const user = await this.userModel.findById(userId).exec();
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+  
+      // Lọc danh sách bạn bè đã chấp nhận (isUnFriend = false và có acceptedDay)
+      const acceptedFriendsIds = user.friends
+        .filter(friend => !friend.isUnFriend && friend.acceptedDay)
+        .map(friend => friend.IDFRIEND);
+  
+      // Truy vấn các bạn bè có trong danh sách
+      return this.userModel.find({ _id: { $in: acceptedFriendsIds } }).exec();
+    }
 }

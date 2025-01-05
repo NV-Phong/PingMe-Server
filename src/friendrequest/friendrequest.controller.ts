@@ -13,15 +13,8 @@ export class FriendRequestController {
 
 
   @Post('accept/:friendRequestId')
-  async acceptRequest(
-    @Param('friendRequestId') friendRequestId: string,
-    @Body() body: { IDSender: string; IDReceiver: string },
-  ) {
-    return this.friendRequestService.acceptRequest(
-      body.IDSender,
-      body.IDReceiver,
-      friendRequestId,
-    );
+  async acceptRequest(@Param('friendRequestId') friendRequestId: string) {
+    return this.friendRequestService.acceptRequest(friendRequestId);
   }
   @Post('decline/:friendRequestId')
   async declineRequest(

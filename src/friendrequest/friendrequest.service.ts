@@ -5,7 +5,6 @@ import {FriendRequest} from 'src/schema/friendrequest.schema';
 import { FriendRequestStatus } from 'src/types/friend-request.enum';
 import { User } from 'src/schema/use.schema'; 
 import { UserService } from 'src/user/user.service';
-import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class FriendRequestService {
   constructor(
@@ -40,38 +39,40 @@ export class FriendRequestService {
 
     return newRequest.save();
   }
-  async acceptRequest(IDSender: string, IDReceiver: string, IDFriendRequest: string) {
-    // Cập nhật trạng thái yêu cầu kết bạn
+  async acceptRequest(friendRequestId: string): Promise<{ message: string }> {
+    // Tìm yêu cầu kết bạn với trạng thái PENDING
     const request = await this.friendRequestModel.findOneAndUpdate(
-      { _id: IDFriendRequest, Status: FriendRequestStatus.PENDING },
+      { _id: friendRequestId, Status: FriendRequestStatus.PENDING },
       { Status: FriendRequestStatus.ACCEPTED },
       { new: true },
     );
-
+  
     if (!request) {
       throw new HttpException(
         { message: 'Friend request not found or already handled.' },
         HttpStatus.BAD_REQUEST,  // Trả về mã lỗi 400 nếu không tìm thấy yêu cầu
       );
     }
-
-    // Cập nhật danh sách bạn bè của cả người gửi và người nhận
+  
+    const { IDSender, IDReceiver } = request; // Lấy ID của người gửi và người nhận từ yêu cầu
+  
     try {
+      // Tìm người gửi và người nhận
       const sender = await this.userModel.findById(IDSender);
       const receiver = await this.userModel.findById(IDReceiver);
-
+  
       if (!sender || !receiver) {
         throw new NotFoundException('User not found.');
       }
-
+  
       // Cập nhật danh sách bạn bè của người gửi
       sender.friends.push({
         IDFRIEND: IDReceiver,
         acceptedDay: new Date(),
-        isPublic: true,  // Giá trị mặc định
+        isPublic: true,
         isUnFriend: false,
       });
-
+  
       // Cập nhật danh sách bạn bè của người nhận
       receiver.friends.push({
         IDFRIEND: IDSender,
@@ -79,23 +80,20 @@ export class FriendRequestService {
         isPublic: true,
         isUnFriend: false,
       });
-
-      // Lưu lại người gửi và người nhận với danh sách bạn bè đã được cập nhật
+  
+      // Lưu lại thông tin
       await sender.save();
       await receiver.save();
-
+  
+      return { message: 'Friend request accepted successfully.' }; // Thông báo thành công
     } catch (error) {
       throw new HttpException(
         { message: 'Error updating friends list.' },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
-    return {
-      message: 'Friend request accepted successfully.',
-      request,
-    };
   }
+  
   async declineRequest(IDSender: string, IDReceiver: string, IDFriendRequest: string) {
     const request = await this.friendRequestModel.findOneAndUpdate(
       { _id: IDFriendRequest, Status: FriendRequestStatus.PENDING },

@@ -11,4 +11,9 @@ export class UserController {
    GetUserByKeyword(@Param('keyword') keyword: string) {
       return this.userService.SearchUsersByKeyword(keyword);
    }
+
+   @Get(':userId/friends')
+   async getFriends(@Param('userId') userId: string) {
+     return this.userService.getAcceptedFriends(userId);
+   }
 }
