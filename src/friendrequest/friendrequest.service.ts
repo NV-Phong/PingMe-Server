@@ -5,6 +5,7 @@ import {FriendRequest} from 'src/schema/friendrequest.schema';
 import { FriendRequestStatus } from 'src/types/friend-request.enum';
 import { User } from 'src/schema/use.schema'; 
 import { UserService } from 'src/user/user.service';
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class FriendRequestService {
   constructor(
@@ -31,7 +32,12 @@ export class FriendRequestService {
         );
     }
 
-    const newRequest = new this.friendRequestModel({ IDSender, IDReceiver });
+    const newRequest = new this.friendRequestModel({ 
+      IDSender,
+      IDReceiver,
+      Status: FriendRequestStatus.PENDING,
+    });
+
     return newRequest.save();
   }
   async acceptRequest(IDSender: string, IDReceiver: string, IDFriendRequest: string) {
@@ -108,5 +114,22 @@ export class FriendRequestService {
       message: 'Friend request declined successfully.',
       request,
     };
+  }
+// Lấy tất cả yêu cầu kết bạn PENDING của người dùng
+  async getPendingRequestsForUser(IDReceiver: string) {
+    const requests = await this.friendRequestModel
+      .find({ IDReceiver, Status: FriendRequestStatus.PENDING })
+      .populate('IDSender', 'username' ) // Populating thông tin người gửi nếu cần (username, hoặc các thông tin khác)
+      .exec();
+
+    if (!requests || requests.length === 0) {
+      throw new NotFoundException('No pending friend requests found.');
+    }
+
+    return requests.map(request => ({
+      IDSender: request.IDSender,
+      DateRequest: request.DateRequest,
+      Status: request.Status,
+    }));
   }
 }

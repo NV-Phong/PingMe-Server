@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param, Delete,UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Delete,UseGuards , Get} from '@nestjs/common';
 import { FriendRequestService } from './friendrequest.service';
 import { AuthGuard } from '@nestjs/passport';
 @Controller('friendrequests')
@@ -33,6 +33,11 @@ export class FriendRequestController {
       body.IDReceiver,
       friendRequestId,  // ID của friend request để từ chối
     );
+  }
+  
+  @Get('pending/:userId')
+  async getPendingRequests(@Param('userId') userId: string) {
+    return this.friendRequestService.getPendingRequestsForUser(userId);
   }
 
 }

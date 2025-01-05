@@ -4,6 +4,7 @@ import { FriendRequestStatus } from 'src/types/friend-request.enum'; // Đườn
 
 @Schema()
 export class FriendRequest extends Document {
+
   _id: Types.ObjectId;
 
   @Prop({ type: String, required: true })
