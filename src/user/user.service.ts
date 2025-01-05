@@ -29,7 +29,7 @@ export class UserService {
             ],
             isDeleted: { $ne: true },
          })
-         .select('displayName email username _id')
+         .select('displayName email username _id cover avatar')
          .exec();
 
       if (users.length === 0) {
@@ -41,6 +41,8 @@ export class UserService {
          username: user.username,
          email: user.email,
          displayName: user.displayName,
+         cover: user.cover,
+         avatar: user.avatar,
       }));
    }
    // Lấy danh sách bạn bè
