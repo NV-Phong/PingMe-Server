@@ -14,10 +14,16 @@ export class UserController {
    }
 
    @Patch(':id')
-  async updateUser(
-    @Param('id') id: string,
-    @Body() updateData: Partial<Omit<User, '_id' | 'password'>>,
-  ) {
-    return this.userService.updateUser(id, updateData);
+   async updateUser(
+      @Param('id') id: string,
+      @Body() updateData: Partial<Omit<User, '_id' | 'password'>>,
+   ) {
+      return this.userService.updateUser(id, updateData);
+   }
+
+   // GET: /users/infuser/:id
+  @Get('infuser/:id')
+  async getUser(@Param('id') id: string): Promise<User> {
+    return this.userService.getUserById(id);
   }
 }
