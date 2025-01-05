@@ -54,4 +54,9 @@ export class UserController {
       const id = req.user.IDUser;
       return this.userService.getUserById(id);
    }
+
+   @Get('infuser/:id')
+   async getUserByID(@Param('id') id: string): Promise<User> {
+      return this.userService.getUserById(id);
+   }
 }
