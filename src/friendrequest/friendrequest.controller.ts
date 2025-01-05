@@ -11,5 +11,17 @@ export class FriendRequestController {
     return this.friendRequestService.sendRequest(body.IDSender, body.IDReceiver);
   }
 
+  
+  @Post('accept/:friendRequestId')
+  async acceptRequest(
+    @Param('friendRequestId') friendRequestId: string,
+    @Body() body: { IDSender: string; IDReceiver: string },
+  ) {
+    return this.friendRequestService.acceptRequest(
+      body.IDSender,
+      body.IDReceiver,
+      friendRequestId,
+    );
+  }
 
 }
