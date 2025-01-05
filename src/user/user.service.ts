@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from 'src/schema/use.schema';
 
 @Injectable()
@@ -39,8 +39,8 @@ export class UserService {
       }));
    }
    // Lấy danh sách bạn bè 
-   async getAcceptedFriends(userId: string): Promise<User[]> {
-      const user = await this.userModel.findById(userId).exec();
+   async getAcceptedFriends(IDUser: string): Promise<User[]> {
+      const user = await this.userModel.findById(IDUser).exec();
       
       if (!user) {
         throw new Error('User not found');
@@ -54,4 +54,27 @@ export class UserService {
       // Truy vấn các bạn bè có trong danh sách
       return this.userModel.find({ _id: { $in: acceptedFriendsIds } }).exec();
     }
+
+    async unfriend(IDUser: string, IDFriend: string): Promise<{ message: string }> {
+      const user = await this.userModel.findById(IDUser);
+      const friend = await this.userModel.findById(IDFriend);
+  
+      if (!user || !friend) {
+        throw new NotFoundException('User or friend not found.');
+      }
+  
+      // Xóa bạn khỏi danh sách của người dùng
+      user.friends = user.friends.filter((f) => f.IDFRIEND !== IDFriend);
+  
+      // Xóa bạn khỏi danh sách của người bạn
+      friend.friends = friend.friends.filter((f) => f.IDFRIEND !== IDUser);
+  
+      // Lưu lại cả hai người dùng với danh sách bạn bè đã cập nhật
+      await user.save();
+      await friend.save();
+  
+      return { message: 'Unfriended successfully.' };
+    }
+    
+    
 }
