@@ -9,6 +9,9 @@ export class Message extends Document {
    @Prop({ required: true })
    Message: string;
 
+   @Prop({ required: true })
+   IdChat: String;
+
    @Prop({
       required: true,
       enum: MessageType,
