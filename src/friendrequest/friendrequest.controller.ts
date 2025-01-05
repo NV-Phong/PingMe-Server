@@ -11,18 +11,5 @@ export class FriendRequestController {
     return this.friendRequestService.sendRequest(body.IDSender, body.IDReceiver);
   }
 
-  @Put(':id/accept')
-  async acceptRequest(@Param('id') IDFriendRequest: string) {
-    return this.friendRequestService.acceptRequest(IDFriendRequest);
-  }
 
-  @Put(':id/reject')
-  async rejectRequest(@Param('id') IDFriendRequest: string) {
-    return this.friendRequestService.rejectRequest(IDFriendRequest);
-  }
-
-  @Delete(':id')
-  async deleteRequest(@Param('id') IDFriendRequest: string) {
-    return this.friendRequestService.deleteRequest(IDFriendRequest);
-  }
 }
