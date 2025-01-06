@@ -29,6 +29,9 @@ export class Message extends Document {
    @Prop({ required: true })
    IDSender: String;
 
+   @Prop({ required: true })
+   IDReceiver: String;
+
    @Prop({ type: String, enum: MessageStatus, default: MessageStatus.SENT })
    MessageStatus: MessageStatus;
 

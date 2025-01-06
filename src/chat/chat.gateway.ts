@@ -10,7 +10,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { ChatType } from 'src/types/chat-type.enum';
 
-@WebSocketGateway(3002, {
+@WebSocketGateway({
    cors: {
       origin: '*', // Cho phép mọi nguồn kết nối
    },
@@ -54,9 +54,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
          senderId: string;
          content: string;
          chatType: string;
+         IDReceiver:string;
       },
    ): Promise<void> {
-      const { room, senderId, content, chatType } = payload;
+      const { room, senderId, content, chatType, IDReceiver } = payload;
 
       if (!senderId || !room || !content || !chatType) {
          console.log('error, thiếu trường dữ liệu');
@@ -80,6 +81,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             senderId,
             room,
             content,
+            IDReceiver,
          );
 
          // Gửi tin nhắn đến tất cả người dùng trong phòng
@@ -102,6 +104,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
          const message = await this.chatService.saveMessage(
             senderId,
             room,
+            IDReceiver,
             content,
          );
 
@@ -120,6 +123,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
    @SubscribeMessage('get-messages')
    async handleGetMessages(client: Socket, room: string): Promise<void> {
       const messages = await this.chatService.getMessages(room);
+      console.log(messages);
       client.emit('chat-history', messages);
    }
 }

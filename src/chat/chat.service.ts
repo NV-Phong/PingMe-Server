@@ -18,12 +18,14 @@ export class ChatService {
       senderId: string,
       room: string,
       content: string,
+      IDReceiver:string,
    ): Promise<Message> {
       const newMessage = new this.messageModel({
          Message: content,
          MessageType: MessageType.TEXT, // Đặt mặc định là TEXT, có thể mở rộng sau
          IDSender: senderId,
          IdChat: room, // Lưu room là ObjectId
+         IDReceiver: IDReceiver,
          MessageStatus: MessageStatus.SENT,
       });
 
@@ -33,7 +35,7 @@ export class ChatService {
    // Lấy lịch sử tin nhắn trong phòng
    async getMessages(room: string): Promise<Message[]> {
       return await this.messageModel
-         .find({ room })
+         .find({ IdChat: room }) // Truy vấn theo room
          .sort({ sentAt: 1 }) // Sắp xếp theo thời gian gửi
          .exec();
    }
