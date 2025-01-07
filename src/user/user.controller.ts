@@ -64,7 +64,11 @@ export class UserController {
    @Post('following')
    addFollowing(@Request() req, @Body() followDTO: FollowDTO) {
       followDTO.IDUser = req.user.IDUser;
-      console.log(followDTO);
       return this.userService.addFollowing(followDTO);
+   }
+
+   @Get('follow/stats')
+   async getUserStats(@Request() req) {
+      return this.userService.getUserStats(req.user.IDUser);
    }
 }

@@ -53,6 +53,12 @@ export class User {
 
    @Prop()
    Follow: Follow[];
+
+   @Prop()
+   NumberOfFollowers: number;
+
+   @Prop()
+   NumberOfFollowing: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
