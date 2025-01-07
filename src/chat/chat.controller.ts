@@ -28,12 +28,15 @@ export class ChatController {
       @Request() req,
       @Param('IDReceiver') IDReceiver: string,
    ): Promise<Chat> {
-      const userId = req.user.IDUser;
+      const userId = req.user.IDUser; // Lấy userId từ request
+     
+      // Kiểm tra và xử lý tạo hoặc tìm chat cá nhân
       const chat = await this.chatService.createOrFindPersonalChat(
          userId,
          IDReceiver,
       );
-      return chat;
+     
+      return chat; // Trả về thông tin chat
    }
 
    @Get('loadchat/:chatId')
@@ -42,5 +45,19 @@ export class ChatController {
    ): Promise<{ chat: Chat; messages: Message[] }> {
       const data = await this.chatService.loadChat(chatId);
       return data;
+   }
+
+   // Endpoint để tìm đoạn chat PERSONAL giữa 2 user
+   @Get('personal/findchat/:IDReceiver')
+   async findPersonalChat(
+      @Request() req,
+      @Param('IDReceiver') IDReceiver: string,
+   ): Promise<Chat | { message: string }> {
+      const userId = req.user.IDUser;
+      const chat = await this.chatService.findPersonalChat(userId, IDReceiver);
+      if (!chat) {
+         return { message: 'Chat not found between these users.' };
+      }
+      return chat;
    }
 }
