@@ -54,7 +54,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
          senderId: string;
          content: string;
          chatType: string;
-         IDReceiver:string;
+         IDReceiver: string;
       },
    ): Promise<void> {
       const { room, senderId, content, chatType, IDReceiver } = payload;
@@ -92,24 +92,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       } else if (chatType === ChatType.PERSONAL) {
          // **Xử lý tin nhắn cá nhân**
 
-         // Gửi tin nhắn trực tiếp đến người nhận (room = ID của người nhận)
-         const recipientSocket = this.server.sockets.sockets.get(room);
-
-         if (!recipientSocket) {
-            client.emit('error', 'Recipient is not connected');
-            return;
+         // Nếu client chưa tham gia room, tự động join vào room
+         if (!this.server.sockets.adapter.rooms.get(room)?.has(client.id)) {
+            client.join(room);
+            console.log(`${client.id} đã tham gia phòng: ${room}`);
          }
 
          // Lưu tin nhắn vào MongoDB
          const message = await this.chatService.saveMessage(
             senderId,
             room,
-            IDReceiver,
             content,
+            IDReceiver,
          );
 
-         // Gửi tin nhắn trực tiếp đến người nhận
-         recipientSocket.emit('receive-message', message);
+         // Gửi tin nhắn đến tất cả người dùng trong phòng
+         this.server.to(room).emit('receive-message', message);
 
          // Xác nhận gửi thành công cho người gửi
          client.emit('message-sent', message);

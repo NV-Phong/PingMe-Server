@@ -4,27 +4,26 @@ import { FriendRequestStatus } from 'src/types/friend-request.enum'; // Đườn
 
 @Schema()
 export class FriendRequest extends Document {
+   _id: Types.ObjectId;
 
-  _id: Types.ObjectId;
+   @Prop({ type: String, required: true })
+   IDSender: string;
 
-  @Prop({ type: String, required: true })
-  IDSender: string;
+   @Prop({ type: String, required: true })
+   IDReceiver: string;
 
-  @Prop({ type: String, required: true })
-  IDReceiver: string;
+   @Prop({
+      type: String,
+      enum: FriendRequestStatus,
+      default: FriendRequestStatus.PENDING,
+   })
+   Status: FriendRequestStatus;
 
-  @Prop({ 
-    type: String, 
-    enum: FriendRequestStatus, 
-    default: FriendRequestStatus.PENDING 
-  })
-  Status: FriendRequestStatus;
+   @Prop({ type: Date, default: Date.now })
+   DateRequest: Date;
 
-  @Prop({ type: Date, default: Date.now })
-  DateRequest: Date;
-
-  @Prop({ type: Boolean, default: false })
-  IsDeleted: boolean;
+   @Prop({ type: Boolean, default: false })
+   IsDeleted: boolean;
 }
 
 export const FriendRequestSchema = SchemaFactory.createForClass(FriendRequest);

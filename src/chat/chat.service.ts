@@ -18,7 +18,7 @@ export class ChatService {
       senderId: string,
       room: string,
       content: string,
-      IDReceiver:string,
+      IDReceiver: string,
    ): Promise<Message> {
       const newMessage = new this.messageModel({
          Message: content,
