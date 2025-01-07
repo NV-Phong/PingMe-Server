@@ -162,4 +162,16 @@ export class UserService {
 
       return { message: 'Followed successfully' };
    }
+
+   async getUserStats(IDUser: string) {
+      const user = await this.userModel.findById(IDUser);
+      if (!user) {
+         throw new Error('User not found');
+      }
+
+      return {
+         numberOfFollowers: user.NumberOfFollowers,
+         numberOfFollowing: user.NumberOfFollowing,
+      };
+   }
 }
