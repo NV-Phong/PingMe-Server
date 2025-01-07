@@ -8,7 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FriendRequest } from 'src/schema/friendrequest.schema';
 import { FriendRequestStatus } from 'src/types/friend-request.enum';
-import { User } from 'src/schema/use.schema';
+import { User } from 'src/schema/user.schema';
 
 @Injectable()
 export class FriendRequestService {

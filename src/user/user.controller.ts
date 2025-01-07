@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/schema/use.schema';
+import { User } from 'src/schema/user.schema';
 import { FollowDTO } from './dto/follow.dto';
 
 @Controller('user')

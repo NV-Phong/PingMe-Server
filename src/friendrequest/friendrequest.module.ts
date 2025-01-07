@@ -6,7 +6,7 @@ import {
 } from 'src/schema/friendrequest.schema';
 import { FriendRequestController } from './friendrequest.controller';
 import { FriendRequestService } from './friendrequest.service';
-import { User, UserSchema } from 'src/schema/use.schema';
+import { User, UserSchema } from 'src/schema/user.schema';
 
 @Module({
    imports: [
