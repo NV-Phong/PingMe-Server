@@ -43,13 +43,17 @@ export class ChatService {
    }
 
    async findChatsByMemberId(memberId: string): Promise<Chat[]> {
+      // Tìm tất cả các chat mà thành viên tham gia
       return this.chatModel
-         .find({
-            'GroupChat.IDMember': memberId, // Truy vấn GroupChatMember.IDMEMBER
-            IsDeleted: false, // Nếu bạn muốn loại bỏ các chat đã bị xóa
-         })
-         .exec();
-   }
+        .find({
+          GroupChat: {
+            $elemMatch: { UserId: new Types.ObjectId(memberId) }, // Tìm thành viên trong GroupChat
+          },
+          IsDeleted: false, // Nếu bạn muốn loại bỏ các chat đã bị xóa
+        })
+        .exec();
+    }
+    
 
    // Tìm đoạn chat PERSONAL giữa 2 user
    async findPersonalChat(
