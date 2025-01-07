@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/schema/use.schema';
+import { User, UserDocument } from 'src/schema/user.schema';
 import { LoginDTO, RegisterDTO } from './dto/post.dto';
 import * as bcrypt from 'bcrypt';
 
