@@ -45,8 +45,8 @@ export class ChatService {
    async findChatsByMemberId(memberId: string): Promise<Chat[]> {
       return this.chatModel
          .find({
-            'GroupChat.IDMember': memberId, // Truy vấn GroupChatMember.IDMEMBER
-            IsDeleted: false, // Nếu bạn muốn loại bỏ các chat đã bị xóa
+            'GroupChat.UserId': new Types.ObjectId(memberId),
+            IsDeleted: false,
          })
          .exec();
    }
