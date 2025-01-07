@@ -54,7 +54,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
          senderId: string;
          content: string;
          chatType: string;
-         IDReceiver:string;
+         IDReceiver: string;
       },
    ): Promise<void> {
       const { room, senderId, content, chatType, IDReceiver } = payload;
