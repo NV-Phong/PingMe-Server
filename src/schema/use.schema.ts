@@ -50,6 +50,9 @@ export class User {
       isPublic: boolean;
       isUnFriend: boolean;
    }>;
+
+   @Prop()
+   Follow: Follow[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -7,6 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from 'src/schema/use.schema';
+import { FollowDTO } from './dto/follow.dto';
 
 @Injectable()
 export class UserService {
@@ -122,5 +123,31 @@ export class UserService {
       } catch (error) {
          throw new NotFoundException(`User with ID "${id}" not found`);
       }
+   }
+
+   // Thêm 1 Following
+   async addFollowing(followDTO: FollowDTO): Promise<User> {
+      const user = await this.userModel.findById(followDTO.IDUser).exec();
+
+      if (!user) {
+         throw new Error('User not found');
+      }
+
+      // Kiểm tra nếu người dùng đã theo dõi trước đó
+      const alreadyFollowing = user.Follow?.some(
+         (follow) => follow.Following === followDTO.IDFollowing,
+      );
+
+      if (alreadyFollowing) {
+         throw new Error('Already following this user');
+      }
+
+      // Thêm thông tin người được theo dõi vào mảng Follow
+      user.Follow = user.Follow || [];
+      user.Follow.push({
+         Following: followDTO.IDFollowing,
+      });
+
+      return user.save();
    }
 }

@@ -11,6 +11,7 @@ import {
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/schema/use.schema';
+import { FollowDTO } from './dto/follow.dto';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
@@ -58,5 +59,12 @@ export class UserController {
    @Get('infuser/:id')
    async getUserByID(@Param('id') id: string): Promise<User> {
       return this.userService.getUserById(id);
+   }
+
+   @Post('following')
+   addFollowing(@Request() req, @Body() followDTO: FollowDTO) {
+      followDTO.IDUser = req.user.IDUser;
+      console.log(followDTO);
+      return this.userService.addFollowing(followDTO);
    }
 }
