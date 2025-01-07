@@ -7,7 +7,7 @@ declare const module: any;
 
 async function bootstrap() {
    const app = await NestFactory.create<NestExpressApplication>(AppModule);
-   app.useStaticAssets(join(__dirname, '..', '/src/file/repository'));
+   app.useStaticAssets(join(__dirname, '..', '/repository'));
    app.enableCors({
       origin: (origin, callback) => {
          if (!origin || origin.startsWith(process.env.CLIENT_CORS)) {
@@ -30,4 +30,3 @@ async function bootstrap() {
    }
 }
 bootstrap();
-

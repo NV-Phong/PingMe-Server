@@ -18,7 +18,7 @@ import {
     @UseInterceptors(
       FileInterceptor('file', {
         storage: diskStorage({
-          destination: './src/file/repository',
+          destination: './repository',
           filename: (req, file, callback) => {
             const uniqueSuffix =
               Date.now() + '-' + Math.round(Math.random() * 1e9);
