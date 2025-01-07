@@ -126,28 +126,52 @@ export class UserService {
    }
 
    // Thêm 1 Following
-   async addFollowing(followDTO: FollowDTO): Promise<User> {
-      const user = await this.userModel.findById(followDTO.IDUser).exec();
+   async addFollowing(followDTO: FollowDTO) {
+      const [userFollowing, userFollower] = await Promise.all([
+         this.userModel.findById(followDTO.IDUser).exec(),
+         this.userModel.findById(followDTO.IDFollowing).exec(),
+      ]);
 
+      if (!userFollowing || !userFollower) {
+         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+
+      if (
+         userFollowing.Follow?.some(
+            (follow) => follow.Following === followDTO.IDFollowing,
+         )
+      ) {
+         throw new HttpException(
+            'Already following this user',
+            HttpStatus.BAD_REQUEST,
+         );
+      }
+
+      // Thêm người theo dõi vào mảng Follow
+      userFollowing.Follow?.push({ Following: followDTO.IDFollowing });
+      userFollower.Follow?.push({ Follower: followDTO.IDUser });
+
+      // Cập nhật số lượng người theo dõi và đang theo dõi
+      userFollowing.NumberOfFollowing =
+         (userFollowing.NumberOfFollowing || 0) + 1;
+      userFollower.NumberOfFollowers =
+         (userFollower.NumberOfFollowers || 0) + 1;
+
+      // Lưu các thay đổi
+      await Promise.all([userFollowing.save(), userFollower.save()]);
+
+      return { message: 'Followed successfully' };
+   }
+
+   async getUserStats(IDUser: string) {
+      const user = await this.userModel.findById(IDUser);
       if (!user) {
          throw new Error('User not found');
       }
 
-      // Kiểm tra nếu người dùng đã theo dõi trước đó
-      const alreadyFollowing = user.Follow?.some(
-         (follow) => follow.Following === followDTO.IDFollowing,
-      );
-
-      if (alreadyFollowing) {
-         throw new Error('Already following this user');
-      }
-
-      // Thêm thông tin người được theo dõi vào mảng Follow
-      user.Follow = user.Follow || [];
-      user.Follow.push({
-         Following: followDTO.IDFollowing,
-      });
-
-      return user.save();
+      return {
+         numberOfFollowers: user.NumberOfFollowers,
+         numberOfFollowing: user.NumberOfFollowing,
+      };
    }
 }
